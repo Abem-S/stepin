@@ -1,0 +1,51 @@
+# Dependencies
+stepin/node_modules/
+backend/venv/
+
+# Build outputs
+stepin/.next/
+stepin/out/
+stepin/build/
+
+# Environment files
+stepin/.env
+stepin/.env.local
+stepin/.env*.local
+backend/.env
+backend/.env.local
+
+# Python
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Misc
+*.pem
+
+# Kiro (spec workflow)
+.kiro/

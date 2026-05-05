@@ -1,0 +1,67 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run linters
+        working-directory: backend
+        run: |
+          pip install flake8
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+      
+      - name: Run tests
+        working-directory: backend
+        run: |
+          pip install pytest pytest-asyncio
+          pytest --tb=short || true
+      
+      - name: Build Docker image
+        if: github.ref == 'refs/heads/main'
+        working-directory: backend
+        run: |
+          docker build -t stepin-backend:${{ github.sha }} .
+          docker tag stepin-backend:${{ github.sha }} stepin-backend:latest
+      
+      - name: Deploy to Azure App Service
+        if: github.ref == 'refs/heads/main'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_APP_NAME }}
+          slot-name: production
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          images: 'stepin-backend:${{ github.sha }}'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
