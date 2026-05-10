@@ -175,8 +175,3 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_API_URL=http://localhost:8001
 ```
 
----
-
-## License
-
-MIT
